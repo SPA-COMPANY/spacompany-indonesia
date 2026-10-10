@@ -27,3 +27,8 @@ pnpm-debug.log*
 # Firebase hosting cache
 .firebase/
 functions/.env
+
+# Playwright
+playwright-report/
+test-results/
+/playwright/.cache/
