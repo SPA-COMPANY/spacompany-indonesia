@@ -1,0 +1,30 @@
+name: E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # No repo secrets are needed: playwright.config.ts starts the dev server
+      # with non-secret placeholder PUBLIC_FIREBASE_* / PUBLIC_PAYPAL_CLIENT_ID
+      # values, and every spec blocks outbound third-party requests.
+      - run: npm run e2e
+        env: { CI: 'true' }
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
